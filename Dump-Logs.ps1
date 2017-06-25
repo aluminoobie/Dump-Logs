@@ -19,4 +19,11 @@ param (
 	[string]$path
 )
 
-Get-WinEvent -listlog * | where {$_.recordcount -gt '0'}
+$LogList = Get-WinEvent -listlog * | where {$_.recordcount -gt '0'} | ForEach-Object {$_.LogName}
+
+for ($len=0; $len -lt $LogList.Length; $len++){
+	$filename = $LogList[$len] -replace'[/W]'
+	Get-WinEvent $LogList[$len] | Export-Csv $path'\'$filename.csv
+	}
+
+Write-Host "$len log files written to $path"
